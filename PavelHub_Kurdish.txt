@@ -646,3 +646,64 @@ Rayfield:Notify({
 	Content = "✅ All tools ready! Enjoy, Pavel.",
 	Duration = 5
 })
+
+-- Create screen GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "PavelHubBadge"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+
+-- Create badge frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 350, 0, 80)
+frame.Position = UDim2.new(0.5, -175, 0.05, 0)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0
+frame.BackgroundTransparency = 0.1
+frame.Parent = screenGui
+frame.AnchorPoint = Vector2.new(0.5, 0)
+frame.ClipsDescendants = true
+frame.Visible = true
+
+-- UICorner
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = frame
+
+-- Title
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -20, 0, 20)
+title.Position = UDim2.new(0, 10, 0, 5)
+title.BackgroundTransparency = 1
+title.Text = "PavelHub"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = frame
+
+-- Message
+local message = Instance.new("TextLabel")
+message.Size = UDim2.new(1, -20, 0, 50)
+message.Position = UDim2.new(0, 10, 0, 25)
+message.BackgroundTransparency = 1
+message.TextWrapped = true
+message.Text = "Welcome to PavelHub. It has English version and Kurdish version. بەرخێبێن بۆ پاڤێڵ هەب دوو ڤێرژنی هەیە ئینگلیزی و کوردی"
+message.Font = Enum.Font.Gotham
+message.TextSize = 14
+message.TextColor3 = Color3.fromRGB(220, 220, 220)
+message.TextXAlignment = Enum.TextXAlignment.Left
+message.TextYAlignment = Enum.TextYAlignment.Top
+message.Parent = frame
+
+-- Tween and remove after 6 seconds
+local TweenService = game:GetService("TweenService")
+
+wait(6)
+
+local fadeOut = TweenService:Create(frame, TweenInfo.new(1), {BackgroundTransparency = 1})
+fadeOut:Play()
+
+fadeOut.Completed:Connect(function()
+    screenGui:Destroy()
+end)
