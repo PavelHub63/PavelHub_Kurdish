@@ -640,11 +640,180 @@ BrainrotTab:CreateButton({
     end
 })
 
+
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+
+local walkSpeedNormal = 44
+local walkSpeedBoost = 44
+local bypassEnabled = false
+
+-- Create GUI (same as before)
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "AntiCheatBypassGui"
+screenGui.Parent = Player:WaitForChild("PlayerGui")
+screenGui.ResetOnSpawn = false
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 200, 0, 100)
+frame.Position = UDim2.new(0.5, -100, 0.5, -50)
+frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+frame.Active = true
+frame.Draggable = true
+frame.Parent = screenGui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundTransparency = 1
+title.Text = "Bypass Anti-Cheat"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+title.Parent = frame
+
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 150, 0, 40)
+toggleButton.Position = UDim2.new(0.5, -75, 0, 40)
+toggleButton.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+toggleButton.TextColor3 = Color3.new(1,1,1)
+toggleButton.Font = Enum.Font.GothamBold
+toggleButton.TextSize = 18
+toggleButton.Text = "Enable 2x Speed"
+toggleButton.Parent = frame
+
+toggleButton.MouseButton1Click:Connect(function()
+	bypassEnabled = not bypassEnabled
+	if bypassEnabled then
+		toggleButton.Text = "Disable 2x Speed"
+
+		-- Quick burst to ramp up speed immediately
+		spawn(function()
+			if Player.Character and Player.Character:FindFirstChildOfClass("Humanoid") then
+				local hum = Player.Character:FindFirstChildOfClass("Humanoid")
+				for i = 1, 10 do
+					hum.WalkSpeed = walkSpeedBoost
+					wait(0.02) -- 20ms between sets, fast burst
+				end
+			end
+		end)
+	else
+		toggleButton.Text = "Enable 2x Speed"
+		if Player.Character and Player.Character:FindFirstChildOfClass("Humanoid") then
+			Player.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = walkSpeedNormal
+		end
+	end
+end)
+
+-- Steady loop to maintain speed
+spawn(function()
+	while true do
+		if bypassEnabled and Player.Character and Player.Character:FindFirstChildOfClass("Humanoid") then
+			local hum = Player.Character:FindFirstChildOfClass("Humanoid")
+			if hum.WalkSpeed < walkSpeedBoost then
+				hum.WalkSpeed = walkSpeedBoost
+			end
+		elseif Player.Character and Player.Character:FindFirstChildOfClass("Humanoid") then
+			local hum = Player.Character:FindFirstChildOfClass("Humanoid")
+			if hum.WalkSpeed ~= walkSpeedNormal then
+				hum.WalkSpeed = walkSpeedNormal
+			end
+		end
+		wait(0.05)
+	end
+end)
+
 -- Final Notify
 Rayfield:Notify({
 	Title = "Pavel Hub Loaded",
 	Content = "✅ All tools ready! Enjoy, Pavel.",
 	Duration = 5
+})
+
+BrainrotTab:CreateButton({
+	Name = "Steal Speed",
+	Callback = function()
+		-- // Destroy previous if re-executed
+		if game.CoreGui:FindFirstChild("PavelSpeedBypassGui") then
+			game.CoreGui.PavelSpeedBypassGui:Destroy()
+		end
+
+		-- // Create GUI
+		local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+		ScreenGui.Name = "PavelSpeedBypassGui"
+		ScreenGui.ResetOnSpawn = false
+
+		local Frame = Instance.new("Frame", ScreenGui)
+		Frame.Size = UDim2.new(0, 200, 0, 150)
+		Frame.Position = UDim2.new(0.5, -100, 0.5, -75)
+		Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+		Frame.BorderSizePixel = 0
+		Frame.Active = true
+		Frame.Draggable = true
+
+		local Title = Instance.new("TextLabel", Frame)
+		Title.Size = UDim2.new(1, 0, 0, 30)
+		Title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+		Title.Text = "Pavel Speed Bypass"
+		Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+		Title.Font = Enum.Font.Gotham
+		Title.TextSize = 14
+
+		local Button1 = Instance.new("TextButton", Frame)
+		Button1.Size = UDim2.new(1, -20, 0, 40)
+		Button1.Position = UDim2.new(0, 10, 0, 40)
+		Button1.Text = "Speed 31-32"
+		Button1.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+		Button1.TextColor3 = Color3.fromRGB(255, 255, 255)
+		Button1.Font = Enum.Font.Gotham
+		Button1.TextSize = 14
+
+		local Button2 = Instance.new("TextButton", Frame)
+		Button2.Size = UDim2.new(1, -20, 0, 40)
+		Button2.Position = UDim2.new(0, 10, 0, 90)
+		Button2.Text = "Speed 25-27"
+		Button2.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+		Button2.TextColor3 = Color3.fromRGB(255, 255, 255)
+		Button2.Font = Enum.Font.Gotham
+		Button2.TextSize = 14
+
+		-- // Speed Function
+		local function SpeedBypass(targetSpeed)
+			local player = game.Players.LocalPlayer
+			local char = player.Character or player.CharacterAdded:Wait()
+			local hum = char:WaitForChild("Humanoid")
+			local hrp = char:WaitForChild("HumanoidRootPart")
+
+			if hum:FindFirstChild("PavelSpeedBypass") then return end
+
+			local tag = Instance.new("BoolValue", hum)
+			tag.Name = "PavelSpeedBypass"
+
+			local RunService = game:GetService("RunService")
+			local conn
+
+			conn = RunService.RenderStepped:Connect(function()
+				if not hum or hum.Health <= 0 or not char:FindFirstChild("HumanoidRootPart") then
+					conn:Disconnect()
+					return
+				end
+
+				local moveDir = hum.MoveDirection
+				if moveDir.Magnitude > 0 then
+					local velocity = moveDir * targetSpeed
+					hrp.Velocity = Vector3.new(velocity.X, hrp.Velocity.Y, velocity.Z)
+				end
+			end)
+		end
+
+		-- // Button Events
+		Button1.MouseButton1Click:Connect(function()
+			SpeedBypass(31)
+		end)
+
+		Button2.MouseButton1Click:Connect(function()
+			SpeedBypass(26)
+		end)
+	end
 })
 
 -- Create screen GUI
